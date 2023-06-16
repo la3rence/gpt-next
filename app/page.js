@@ -1,113 +1,264 @@
-import Image from 'next/image'
+"use client";
+import { useEffect, useRef, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { fetchEventSource } from "@microsoft/fetch-event-source";
+import Title from "@/components/title";
+import hljs from "highlight.js";
+import MarkdownIt from "markdown-it";
+import "highlight.js/styles/github-dark.css";
+
+let parentMessageId = null;
+let conversationId = null;
+
+const md = new MarkdownIt({
+  highlight: function (str, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      return hljs.highlight(str, {
+        language: lang,
+        ignoreIllegals: true,
+      }).value;
+    }
+    return "";
+  },
+});
+
+const Message = ({ role, content, serverUP }) => {
+  if (role === "user") {
+    return (
+      <>
+        <div className="ml-6 h-4">
+          <span className="rounded-full inline-block w-4 h-4 bg-zinc-500 align-middle"></span>
+          <span className="pl-1 text-sm">YOU</span>
+        </div>
+        <div
+          className="mx-6 py-4"
+          dangerouslySetInnerHTML={{
+            __html: md.render(`${content}`),
+          }}
+        ></div>
+      </>
+    );
+  }
+  return (
+    <>
+      <div className="ml-6 h-4">
+        {!serverUP && (
+          <span className="rounded-full inline-block w-4 h-4 bg-red-500 align-middle"></span>
+        )}
+        {serverUP && (
+          <span className="rounded-full inline-block w-4 h-4 bg-blue-500 align-middle"></span>
+        )}
+        <span className="pl-1 text-sm">GPT</span>
+      </div>
+      <div
+        className="mx-6 py-4"
+        dangerouslySetInnerHTML={{
+          __html: md.render(`${content}`),
+        }}
+      ></div>
+    </>
+  );
+};
 
 export default function Home() {
+  const [chat, setChat] = useState([]);
+  const inputRef = useRef();
+  const bottomRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [serverUP, setServerUP] = useState(true);
+
+  useEffect(() => {
+    setChat(JSON.parse(localStorage.getItem("chat.history")) || []);
+    conversationId = localStorage.getItem("chat.conversationId") || null;
+    parentMessageId = localStorage.getItem("chat.parentMessageId") || null;
+    const checkStatus = async () => {
+      try {
+        const response = await fetch(process.env.NEXT_PUBLIC_GPT_STATUS, {
+          headers: { authorization: "test" },
+        });
+        const data = await response.json();
+        if (response.status !== 200 || !data) {
+          setServerUP(false);
+        }
+      } catch (error) {
+        setServerUP(false);
+      }
+    };
+    checkStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const send = async () => {
+    const question = inputRef?.current?.value;
+    if (question === "" || !question) {
+      return;
+    }
+    chat.push({ role: "user", content: question });
+    inputRef.current.value = "";
+    await answer(question);
+  };
+
+  const answer = async (question) => {
+    setIsLoading(true);
+    const body = {
+      messages: [
+        {
+          id: uuidv4(),
+          author: {
+            role: "user",
+          },
+          content: {
+            parts: [question],
+            content_type: "text",
+          },
+          create_time: (Date.now() / 1000).toFixed(7),
+        },
+      ],
+      parent_message_id: parentMessageId ? parentMessageId : uuidv4(),
+      model: "text-davinci-002-render-sha-mobile",
+      action: "next",
+    };
+    if (conversationId) {
+      body.conversation_id = conversationId;
+    }
+    chat.push({ role: "assistant", content: "●" });
+    setChat([...chat]);
+    let currentData = "";
+    try {
+      await fetchEventSource(process.env.NEXT_PUBLIC_CHAT_API, {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "content-type": "text/event-stream",
+          authorization: "test",
+        },
+        body: JSON.stringify(body),
+        async onopen(res) {
+          setServerUP(true);
+          if (res.status != 200) {
+            setServerUP(false);
+            throw new Error(`Error code ${res.status} ${res.statusText}`);
+          }
+        },
+        onmessage(event) {
+          if (event.data === "[DONE]") {
+            return;
+          }
+          let data;
+          try {
+            data = JSON.parse(event.data);
+          } catch (error) {
+            return;
+          }
+          console.debug("sse onmessage", event.data);
+          currentData = data.message?.content?.parts?.[0];
+          conversationId = data.conversation_id;
+          parentMessageId = data.message.id;
+          setAssistantChat(currentData + "●");
+          bottomRef.current.scrollIntoView({ behavior: "smooth" });
+          localStorage.setItem("chat.conversationId", conversationId);
+          localStorage.setItem("chat.parentMessageId", parentMessageId);
+        },
+        onerror(error) {
+          throw error;
+        },
+        async onclose() {
+          console.debug("sse closed");
+          setAssistantChat(currentData);
+          setIsLoading(false);
+          localStorage.setItem("chat.history", JSON.stringify(chat));
+        },
+      });
+    } catch (error) {
+      setAssistantChat(error.message);
+      setIsLoading(false);
+      localStorage.setItem("chat.history", JSON.stringify(chat));
+      return;
+    }
+  };
+
+  const setAssistantChat = (content) => {
+    chat.pop();
+    chat.push({ role: "assistant", content });
+    setChat([...chat]);
+  };
+
+  const regenerate = async () => {
+    chat.pop();
+    await answer(chat.slice(-1)[0].content);
+  };
+  const clearHistory = () => {
+    if (window.confirm("确认清空当前记录?")) {
+      setChat([]);
+      localStorage.removeItem("chat.history");
+      localStorage.removeItem("chat.conversationId");
+      localStorage.removeItem("chat.parentMessageId");
+      parentMessageId = null;
+      conversationId = null;
+    }
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
+    <div className="max-w-3xl mx-auto overflow-y-scroll">
+      <Title />
+      <div className="mt-4">
+        {chat.map((messageObj, index) => {
+          return (
+            <Message
+              content={messageObj.content}
+              role={messageObj.role}
+              key={index}
+              serverUP={serverUP}
             />
-          </a>
+          );
+        })}
+      </div>
+      {chat.length > 1 && !isLoading && (
+        <div className="flex">
+          <div className="flex-1"></div>
+          <div
+            className="p-1 h-6 w-6 mr-4 cursor-pointer text-lg"
+            onClick={regenerate}
+          >
+            ↺
+          </div>
         </div>
+      )}
+      <div ref={bottomRef} className="mb-36 text-center">
+        {isLoading && <span className="text-2xl">■</span>}
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+      {!isLoading && (
+        <div id="input" className="fixed bottom-14 left-0 w-full">
+          <div className="flex justify-center">
+            <input
+              disabled={isLoading}
+              ref={inputRef}
+              type="text"
+              placeholder=""
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  send();
+                }
+              }}
+              className="h-12 pl-4 py-3 bg-zinc-100 text-center flex-1 dark:bg-zinc-800 rounded-none outline-none disabled:bg-zinc-50 disabled:dark:bg-zinc-950"
+            />
+            <button
+              className="w-12 h-12 bg-zinc-100 dark:bg-zinc-800 text-2xl"
+              onClick={send}
+            >
+              ▲
+            </button>
+            {chat.length > 0 && (
+              <button
+                className="w-12 bg-zinc-100 dark:bg-zinc-800 text-2xl"
+                onClick={clearHistory}
+              >
+                ○
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
