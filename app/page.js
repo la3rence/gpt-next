@@ -155,6 +155,9 @@ export default function Home() {
           conversationId = data.conversation_id;
           parentMessageId = data.message.id;
           setAssistantChat(currentData + "●");
+          if (window.navigator.vibrate) {
+            window.navigator.vibrate(15);
+          }
           bottomRef.current.scrollIntoView({ behavior: "smooth" });
           localStorage.setItem("chat.conversationId", conversationId);
           localStorage.setItem("chat.parentMessageId", parentMessageId);
