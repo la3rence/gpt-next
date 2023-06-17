@@ -66,6 +66,7 @@ export default function Home() {
   const bottomRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
   const [serverUP, setServerUP] = useState(true);
+  const [isBottom, setIsBottom] = useState(true);
 
   useEffect(() => {
     setChat(JSON.parse(localStorage.getItem("chat.history")) || []);
@@ -85,6 +86,14 @@ export default function Home() {
       }
     };
     checkStatus();
+    const handleScroll = () => {
+      const documentHeight = document.documentElement.scrollHeight;
+      setIsBottom(window.innerHeight + window.scrollY >= documentHeight);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -230,7 +239,7 @@ export default function Home() {
       <div ref={bottomRef} className="mb-36 text-center">
         {isLoading && <span className="text-2xl">■</span>}
       </div>
-      {!isLoading && (
+      {!isLoading && isBottom && (
         <div id="input" className="fixed bottom-14 left-0 w-full">
           <div className="flex justify-center">
             <input
