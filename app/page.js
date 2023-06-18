@@ -27,7 +27,7 @@ const Message = ({ role, content, serverUP }) => {
     return (
       <>
         <div className="ml-6 h-4">
-          <span className="rounded-full inline-block w-4 h-4 bg-zinc-500 align-middle"></span>
+          <span className="rounded-full inline-block w-4 h-4 bg-zinc-600 align-middle"></span>
           <span className="pl-1 text-sm">YOU</span>
         </div>
         <div
@@ -86,9 +86,10 @@ export default function Home() {
       }
     };
     checkStatus();
+
     const handleScroll = () => {
       const documentHeight = document.documentElement.scrollHeight;
-      setIsBottom(window.innerHeight + window.scrollY >= documentHeight);
+      setIsBottom(window.innerHeight + window.scrollY >= documentHeight - 50);
     };
     window.addEventListener("scroll", handleScroll);
     return () => {
@@ -211,7 +212,7 @@ export default function Home() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto overflow-y-scroll">
+    <div className="max-w-3xl mx-auto">
       <Title />
       <div className="mt-4">
         {chat.map((messageObj, index) => {
@@ -240,7 +241,7 @@ export default function Home() {
         {isLoading && <span className="text-2xl">■</span>}
       </div>
       {!isLoading && isBottom && (
-        <div id="input" className="fixed bottom-14 left-0 w-full">
+        <div id="input" className="fixed bottom-10 left-0 w-full">
           <div className="flex justify-center">
             <input
               disabled={isLoading}
