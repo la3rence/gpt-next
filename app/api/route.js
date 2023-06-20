@@ -1,5 +1,5 @@
 export const preferredRegion = ["sin1", "syd1"];
-export const runtime = "edge";
+export const runtime = "nodejs"; // next.js issue (edge rewrites not work)
 
 const pickHeaders = (headers, keys) => {
   const picked = new Headers();
