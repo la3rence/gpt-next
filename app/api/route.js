@@ -66,7 +66,6 @@ const handleRequest = async (req) => {
   }
 
   const url = new URL(pathname, `https://${process.env.GPT_DOMAIN}`).href; // self-hosted api
-  console.log(url);
   const headers = pickHeaders(req.headers, [
     "content-type",
     "accept",
