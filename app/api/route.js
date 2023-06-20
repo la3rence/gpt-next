@@ -1,5 +1,5 @@
 export const preferredRegion = ["sin1", "syd1"];
-export const runtime = "nodejs";
+export const runtime = "edge";
 
 const pickHeaders = (headers, keys) => {
   const picked = new Headers();
