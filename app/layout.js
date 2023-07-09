@@ -1,5 +1,6 @@
 import "./globals.css";
 import Providers from "./provider";
+import Script from "next/script";
 
 export const metadata = {
   title: "ChatGPT",
@@ -18,6 +19,11 @@ export default function RootLayout({ children }) {
           <main>{children}</main>
         </Providers>
       </body>
+      <Script
+        async
+        src="https://analytics.lawrenceli.me/script.js"
+        data-website-id="50f890d5-49f1-43f0-91ca-f0a68a83c4f5"
+      />
     </html>
   );
 }
