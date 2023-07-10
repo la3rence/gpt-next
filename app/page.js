@@ -214,6 +214,16 @@ export default function Home() {
   return (
     <div className="max-w-3xl mx-auto">
       <Title />
+      <div
+        className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4"
+        role="alert"
+      >
+        <p class="font-bold">OPENAI Status</p>
+        <p>
+          Customer logins to ChatGPT are not available. At this time many users
+          are not able to log into ChatGPT. We are actively investigating.
+        </p>
+      </div>
       <div className="mt-4">
         {chat.map((messageObj, index) => {
           return (
