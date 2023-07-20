@@ -160,10 +160,13 @@ export default function Home() {
           } catch (error) {
             return;
           }
+          if (data.is_completion === true) {
+            return;
+          }
           console.debug("sse onmessage", event.data);
           currentData = data.message?.content?.parts?.[0];
           conversationId = data.conversation_id;
-          parentMessageId = data.message.id;
+          parentMessageId = data.message?.id;
           setAssistantChat(currentData + "●");
           if (window.navigator.vibrate) {
             window.navigator.vibrate(15);
