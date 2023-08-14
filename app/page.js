@@ -125,7 +125,9 @@ export default function Home() {
         },
       ],
       parent_message_id: parentMessageId ? parentMessageId : uuidv4(),
-      model: "text-davinci-002-render-sha-mobile",
+      model: "text-davinci-002-render-sha",
+      timezone_offset_min: -480,
+      arkose_token: null,
       action: "next",
     };
     if (conversationId) {
