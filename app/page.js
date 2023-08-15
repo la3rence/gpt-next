@@ -1,64 +1,14 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, lazy, Suspense } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 import Title from "@/components/title";
-import hljs from "highlight.js";
-import MarkdownIt from "markdown-it";
+// import Message from "@/components/message";
 import "highlight.js/styles/github-dark.css";
 
+const Message = lazy(() => import("@/components/message"));
 let parentMessageId = null;
 let conversationId = null;
-
-const md = new MarkdownIt({
-  highlight: function (str, lang) {
-    if (lang && hljs.getLanguage(lang)) {
-      return hljs.highlight(str, {
-        language: lang,
-        ignoreIllegals: true,
-      }).value;
-    }
-    return "";
-  },
-});
-
-const Message = ({ role, content, serverUP }) => {
-  if (role === "user") {
-    return (
-      <>
-        <div className="ml-6 h-4">
-          <span className="rounded-full inline-block w-4 h-4 bg-zinc-600 align-middle"></span>
-          <span className="pl-1 text-sm">YOU</span>
-        </div>
-        <div
-          className="mx-6 py-4"
-          dangerouslySetInnerHTML={{
-            __html: md.render(`${content}`),
-          }}
-        ></div>
-      </>
-    );
-  }
-  return (
-    <>
-      <div className="ml-6 h-4">
-        {!serverUP && (
-          <span className="rounded-full inline-block w-4 h-4 bg-red-500 align-middle"></span>
-        )}
-        {serverUP && (
-          <span className="rounded-full inline-block w-4 h-4 bg-blue-500 align-middle"></span>
-        )}
-        <span className="pl-1 text-sm">GPT</span>
-      </div>
-      <div
-        className="mx-6 py-4"
-        dangerouslySetInnerHTML={{
-          __html: md.render(`${content}`),
-        }}
-      ></div>
-    </>
-  );
-};
 
 export default function Home() {
   const [chat, setChat] = useState([]);
@@ -233,16 +183,18 @@ export default function Home() {
         </div>
       )}
       <div className="mt-4">
-        {chat.map((messageObj, index) => {
-          return (
-            <Message
-              content={messageObj.content}
-              role={messageObj.role}
-              key={index}
-              serverUP={serverUP}
-            />
-          );
-        })}
+        <Suspense fallback={<div className="text-2xl text-center">●▲■</div>}>
+          {chat.map((messageObj, index) => {
+            return (
+              <Message
+                key={index}
+                content={messageObj.content}
+                role={messageObj.role}
+                serverUP={serverUP}
+              />
+            );
+          })}
+        </Suspense>
       </div>
       {chat.length > 1 && !isLoading && (
         <div className="flex">
