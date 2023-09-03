@@ -210,30 +210,29 @@ export default function Home() {
       <div ref={bottomRef} className="mb-36 text-center">
         {isLoading && <span className="text-2xl">■</span>}
       </div>
-      {!isLoading && isBottom && (
-        <div id="input" className="fixed bottom-10 left-0 w-full">
-          <div className="flex justify-center">
+      {isBottom && (
+        <div id="input" className="fixed bottom-10 w-full max-w-3xl">
+          <div className="flex shadow-md">
             <input
               disabled={isLoading}
               ref={inputRef}
               type="text"
-              placeholder=""
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
                   send();
                 }
               }}
-              className="h-12 pl-4 py-3 bg-zinc-100 text-center flex-1 dark:bg-zinc-800 rounded-none outline-none disabled:bg-zinc-50 disabled:dark:bg-zinc-950"
+              className="max-w-3xl w-full h-12 pl-4 py-3 bg-zinc-50 text-center rounded-none  dark:bg-zinc-800 outline-none disabled:bg-zinc-50 disabled:dark:bg-zinc-950"
             />
             <button
-              className="w-12 h-12 bg-zinc-100 dark:bg-zinc-800 text-2xl"
+              className="w-12 h-12 bg-zinc-50 dark:bg-zinc-800 text-2xl"
               onClick={send}
             >
               ▲
             </button>
             {chat.length > 0 && (
               <button
-                className="w-12 bg-zinc-100 dark:bg-zinc-800 text-2xl"
+                className="w-12 h-12 bg-zinc-50 dark:bg-zinc-800 text-2xl"
                 onClick={clearHistory}
               >
                 ○
