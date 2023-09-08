@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState, lazy, Suspense } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 import Title from "@/components/title";
-// import Message from "@/components/message";
 import "highlight.js/styles/github-dark.css";
 
 const Message = lazy(() => import("@/components/message"));
@@ -16,7 +15,8 @@ export default function Home() {
   const bottomRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
   const [serverUP, setServerUP] = useState(true);
-  const [isBottom, setIsBottom] = useState(true);
+  const [inputText, setInputText] = useState("");
+  const [composition, setComposition] = useState(false);
 
   useEffect(() => {
     setChat(JSON.parse(localStorage.getItem("chat.history")) || []);
@@ -37,25 +37,25 @@ export default function Home() {
     };
     checkStatus();
 
-    const handleScroll = () => {
-      const documentHeight = document.documentElement.scrollHeight;
-      setIsBottom(window.innerHeight + window.scrollY >= documentHeight - 50);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    // const handleScroll = () => {
+    //   const documentHeight = document.documentElement.scrollHeight;
+    //   setIsBottom(window.innerHeight + window.scrollY >= documentHeight - 50);
+    // };
+    // window.addEventListener("scroll", handleScroll);
+    // return () => {
+    //   window.removeEventListener("scroll", handleScroll);
+    // };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const send = async () => {
-    const question = inputRef?.current?.value;
-    if (question === "" || !question) {
+    if (inputText === "" || !inputText) {
       return;
     }
-    chat.push({ role: "user", content: question });
+    chat.push({ role: "user", content: inputText });
+    setInputText("");
     inputRef.current.value = "";
-    await answer(question);
+    await answer(inputText);
   };
 
   const answer = async (question) => {
@@ -166,6 +166,14 @@ export default function Home() {
     }
   };
 
+  const handleComposition = (event) => {
+    if (event.type === "compositionend") {
+      setComposition(false);
+    } else {
+      setComposition(true);
+    }
+  };
+
   return (
     <div className="max-w-3xl mx-auto">
       <Title />
@@ -210,27 +218,38 @@ export default function Home() {
       <div ref={bottomRef} className="mb-36 text-center">
         {isLoading && <span className="text-2xl">■</span>}
       </div>
-      {isBottom && (
+      {
         <div id="input" className="fixed bottom-10 w-full max-w-3xl">
-          <div className="flex shadow-md">
-            <input
+          <div className="flex shadow-md border border-black/5">
+            <textarea
+              rows="1"
               disabled={isLoading}
               ref={inputRef}
-              type="text"
+              placeholder="send a prompt"
+              onChange={(event) => {
+                setInputText(event.target.value);
+              }}
+              onCompositionStart={handleComposition}
+              onCompositionEnd={handleComposition}
               onKeyDown={(event) => {
-                if (event.key === "Enter") {
+                if (event.key === "Enter" && !composition) {
                   send();
                 }
               }}
-              className="max-w-3xl w-full h-12 pl-4 py-3 bg-zinc-50 text-center rounded-none  dark:bg-zinc-800 outline-none disabled:bg-zinc-50 disabled:dark:bg-zinc-950"
+              className="resize-none border-0 max-w-3xl w-full h-12 pl-4 p-3 bg-zinc-50 dark:bg-zinc-800
+              outline-none max-h-24 overflow-y-hidden bg-transparent focus:ring-0 focus-visible:ring-0"
             />
             <button
               className="w-12 h-12 bg-zinc-50 dark:bg-zinc-800 text-2xl"
               onClick={send}
             >
-              ▲
+              {inputText === "" || !inputText ? (
+                <span className="text-zinc-500">▲</span>
+              ) : (
+                <span>▲</span>
+              )}
             </button>
-            {chat.length > 0 && (
+            {chat?.length > 3 && (
               <button
                 className="w-12 h-12 bg-zinc-50 dark:bg-zinc-800 text-2xl"
                 onClick={clearHistory}
@@ -240,7 +259,7 @@ export default function Home() {
             )}
           </div>
         </div>
-      )}
+      }
     </div>
   );
 }
