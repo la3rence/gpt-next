@@ -16,7 +16,6 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [serverUP, setServerUP] = useState(true);
   const [inputText, setInputText] = useState("");
-  const [composition, setComposition] = useState(false);
 
   useEffect(() => {
     setChat(JSON.parse(localStorage.getItem("chat.history")) || []);
@@ -166,14 +165,6 @@ export default function Home() {
     }
   };
 
-  const handleComposition = (event) => {
-    if (event.type === "compositionend") {
-      setComposition(false);
-    } else {
-      setComposition(true);
-    }
-  };
-
   return (
     <div className="max-w-3xl mx-auto">
       <Title />
@@ -232,10 +223,8 @@ export default function Home() {
               onChange={(event) => {
                 setInputText(event.target.value);
               }}
-              onCompositionStart={handleComposition}
-              onCompositionEnd={handleComposition}
               onKeyDown={(event) => {
-                if (event.key === "Enter" && !composition) {
+                if (event.key === "Enter" && !event.nativeEvent.isComposing) {
                   send();
                 }
               }}

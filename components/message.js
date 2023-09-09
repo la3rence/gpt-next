@@ -17,7 +17,7 @@ const Message = ({ role, content, serverUP }) => {
   if (role === "user") {
     return (
       <>
-        <div className="ml-6 h-4">
+        <div className="ml-6 flex items-center">
           <span className="rounded-full inline-block w-4 h-4 bg-zinc-600 align-middle"></span>
           <span className="pl-1 text-sm">YOU</span>
         </div>
@@ -32,7 +32,7 @@ const Message = ({ role, content, serverUP }) => {
   }
   return (
     <>
-      <div className="ml-6 h-4">
+      <div className="ml-6 flex items-center">
         {!serverUP && (
           <span className="rounded-full inline-block w-4 h-4 bg-red-500 align-middle"></span>
         )}
