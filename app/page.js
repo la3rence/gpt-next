@@ -219,8 +219,11 @@ export default function Home() {
         {isLoading && <span className="text-2xl">■</span>}
       </div>
       {
-        <div id="input" className="fixed bottom-10 w-full max-w-3xl">
-          <div className="flex shadow-md border border-black/5">
+        <div
+          id="input"
+          className="fixed bottom-10 w-full max-w-3xl backdrop-blur"
+        >
+          <div className="flex shadow-md border border-zinc-50 dark:border-zinc-800">
             <textarea
               rows="1"
               disabled={isLoading}
@@ -236,11 +239,11 @@ export default function Home() {
                   send();
                 }
               }}
-              className="resize-none border-0 max-w-3xl w-full h-12 pl-4 p-3 bg-zinc-50 dark:bg-zinc-800
-              outline-none max-h-24 overflow-y-hidden bg-transparent focus:ring-0 focus-visible:ring-0"
+              className="resize-none border-0 max-w-3xl w-full h-12 pl-4 p-3 bg-transparent
+              outline-none max-h-24 overflow-y-hidden focus:ring-0 focus-visible:ring-0 "
             />
             <button
-              className="w-12 h-12 bg-zinc-50 dark:bg-zinc-800 text-2xl"
+              className="w-12 h-12 text-2xl bg-transparent"
               onClick={send}
             >
               {inputText === "" || !inputText ? (
@@ -251,7 +254,7 @@ export default function Home() {
             </button>
             {chat?.length > 3 && (
               <button
-                className="w-12 h-12 bg-zinc-50 dark:bg-zinc-800 text-2xl"
+                className="w-12 h-12 text-2xl bg-transparent"
                 onClick={clearHistory}
               >
                 ○
