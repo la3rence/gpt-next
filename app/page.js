@@ -2,10 +2,11 @@
 import React, { useEffect, useRef, useState, lazy, Suspense } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
-import Title from "@/components/title";
+// import Title from "@/components/title";
 import "highlight.js/styles/github-dark.css";
 
 const Message = lazy(() => import("@/components/message"));
+const Title = lazy(() => import("@/components/title"));
 let parentMessageId = null;
 let conversationId = null;
 
@@ -167,7 +168,13 @@ export default function Home() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <Title />
+      <Suspense
+        fallback={
+          <div className="mx-6 mt-20 text-3xl text-center">ChatGPT</div>
+        }
+      >
+        <Title />
+      </Suspense>
       {!serverUP && (
         <div
           className="bg-orange-50 dark:bg-orange-950 border-l-4 border-orange-500 text-orange-700 p-4"

@@ -20,7 +20,7 @@ export default function Title() {
         style={{
           fontSize: "2em",
           minHeight: "4rem",
-          textShadow: "white 0 0 0.1em",
+          // textShadow: "white 0 0 0.1em",
         }}
       />
     </div>
