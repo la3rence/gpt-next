@@ -10,4 +10,72 @@
   p {
     @apply py-2;
   }
+
+  .color-transition {
+    animation: colorChange 10s linear;
+  }
+
+  @keyframes colorChange {
+    0% {
+      background-color: white;
+    }
+
+    10% {
+      background-color: orange;
+    }
+
+    25% {
+      background-color: yellow;
+    }
+
+    50% {
+      background-color: greenyellow;
+    }
+
+    60% {
+      background-color: green;
+    }
+
+    75% {
+      background-color: pink;
+    }
+
+    100% {
+      background-color: white;
+    }
+  }
+
+  .dark-color-transition {
+    animation: darkColorChange 10s linear;
+  }
+
+  @keyframes darkColorChange {
+    0% {
+      background-color: black;
+    }
+
+    10% {
+      background-color: purple;
+    }
+
+    25% {
+      background-color: pink;
+    }
+
+    50% {
+      background-color: orange;
+    }
+
+    60% {
+      background-color: green;
+    }
+
+    75% {
+      background-color: blue;
+    }
+
+    100% {
+      background-color: black;
+    }
+  }
 }

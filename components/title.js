@@ -5,11 +5,11 @@ export default function Title() {
       <TypeAnimation
         sequence={[
           "ChatGPT",
-          500,
+          1000,
           "●.lawrenceli.me",
-          1000,
+          2000,
           "● ChatGPT",
-          1000,
+          2000,
           "●",
         ]}
         wrapper="div"
