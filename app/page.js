@@ -2,7 +2,6 @@
 import React, { useEffect, useRef, useState, lazy, Suspense } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
-// import Title from "@/components/title";
 import "highlight.js/styles/github-dark.css";
 
 const Message = lazy(() => import("@/components/message"));
@@ -36,16 +35,6 @@ export default function Home() {
       }
     };
     checkStatus();
-
-    // const handleScroll = () => {
-    //   const documentHeight = document.documentElement.scrollHeight;
-    //   setIsBottom(window.innerHeight + window.scrollY >= documentHeight - 50);
-    // };
-    // window.addEventListener("scroll", handleScroll);
-    // return () => {
-    //   window.removeEventListener("scroll", handleScroll);
-    // };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const send = async () => {
@@ -121,7 +110,7 @@ export default function Home() {
           parentMessageId = data.message?.id;
           setAssistantChat(currentData + "●");
           if (window.navigator.vibrate) {
-            window.navigator.vibrate(15);
+            window.navigator.vibrate(10);
           }
           bottomRef.current.scrollIntoView({ behavior: "smooth" });
           localStorage.setItem("chat.conversationId", conversationId);
@@ -167,59 +156,59 @@ export default function Home() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <Suspense
-        fallback={
-          <div className="mx-6 mt-20 text-3xl text-center">ChatGPT</div>
-        }
-      >
-        <Title />
-      </Suspense>
-      {!serverUP && (
-        <div
-          className="bg-orange-50 dark:bg-orange-950 border-l-4 border-orange-500 text-orange-700 p-4"
-          role="alert"
+    <div className="max-w-3xl mx-auto relative min-h-[90vh]">
+      <div className="pb-8">
+        <Suspense
+          fallback={
+            <div className="mx-6 mt-20 text-3xl text-center">ChatGPT</div>
+          }
         >
-          <p className="font-bold">ChatGPT Status</p>
-          <p>
-            We are facing some issues to fetch data from OpenAI server. We are
-            actively investigating.
-          </p>
-          <span>Status: https://status.lawrenceli.me</span>
-        </div>
-      )}
-      <div className="mt-4">
-        <Suspense fallback={<div className="text-2xl text-center">●▲■</div>}>
-          {chat.map((messageObj, index) => {
-            return (
-              <Message
-                key={index}
-                content={messageObj.content}
-                role={messageObj.role}
-                serverUP={serverUP}
-              />
-            );
-          })}
+          <Title />
         </Suspense>
-      </div>
-      {chat.length > 1 && !isLoading && (
-        <div className="flex">
-          <div className="flex-1"></div>
+        {!serverUP && (
           <div
-            className="p-1 h-6 w-6 mr-4 cursor-pointer text-lg"
-            onClick={regenerate}
+            className="bg-orange-50 dark:bg-orange-950 border-l-4 border-orange-500 text-orange-700 p-4"
+            role="alert"
           >
-            ↺
+            <p className="font-bold">ChatGPT Status</p>
+            <p>
+              We are facing some issues to fetch data from OpenAI server. We are
+              actively investigating.
+            </p>
+            <span>Status: https://status.lawrenceli.me</span>
           </div>
+        )}
+        <div className="mt-4">
+          <Suspense fallback={<div className="text-2xl text-center">●▲■</div>}>
+            {chat.map((messageObj, index) => {
+              return (
+                <Message
+                  key={index}
+                  content={messageObj.content}
+                  role={messageObj.role}
+                  serverUP={serverUP}
+                />
+              );
+            })}
+          </Suspense>
         </div>
-      )}
-      <div ref={bottomRef} className="mb-36 text-center">
-        {isLoading && <span className="text-2xl">■</span>}
-      </div>
-      {
+        {chat.length > 1 && !isLoading && (
+          <div className="flex">
+            <div className="flex-1"></div>
+            <div
+              className="p-1 h-6 w-6 mr-4 cursor-pointer text-lg"
+              onClick={regenerate}
+            >
+              ↺
+            </div>
+          </div>
+        )}
+        <div ref={bottomRef} className="mb-36 text-center">
+          {isLoading && <span className="text-2xl">■</span>}
+        </div>
         <div
           id="input"
-          className="fixed bottom-10 w-full max-w-3xl backdrop-blur"
+          className="fixed bottom-10 w-full max-w-3xl backdrop-blur caret-blue-500 z-10"
         >
           <div className="flex shadow-md border border-zinc-50 dark:border-zinc-800">
             <textarea
@@ -258,7 +247,20 @@ export default function Home() {
             )}
           </div>
         </div>
-      }
+      </div>
+      <footer className="-bottom-7 absolute w-full z-0 flex items-center justify-center text-xs text-zinc-400">
+        <span className="mx-1 w-3 h-3 inline-block pt-2 bg-zinc-300 dark:bg-zinc-700 rounded-full"></span>
+        <span>Free Research Preview.</span>
+        <span className="mx-2 underline">
+          <a href="https://github.com/Lonor/gpt-next">Source Code</a>
+        </span>
+        <span className="underline">
+          <a href="https://lawrenceli.me/privacy">Privacy</a>
+        </span>
+        <span className="mx-2 underline">
+          <a href="https://status.lawrenceli.me">Status</a>
+        </span>
+      </footer>
     </div>
   );
 }
