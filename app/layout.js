@@ -14,7 +14,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="zh-CN" suppressHydrationWarning={true}>
-      <body className="mb-10 color-transition dark:dark-color-transition">
+      <body className="mb-10">
         <Providers>
           <main>{children}</main>
         </Providers>
