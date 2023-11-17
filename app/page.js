@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState, lazy, Suspense } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 import "highlight.js/styles/github-dark.css";
+import Footer from "@/components/footer";
 
 const Message = lazy(() => import("@/components/message"));
 const Title = lazy(() => import("@/components/title"));
@@ -163,7 +164,7 @@ export default function Home() {
             <div className="mx-6 mt-20 text-3xl text-center">ChatGPT</div>
           }
         >
-          <Title />
+          <Title name="ChatGPT" />
         </Suspense>
         {!serverUP && (
           <div
@@ -187,6 +188,7 @@ export default function Home() {
                   content={messageObj.content}
                   role={messageObj.role}
                   serverUP={serverUP}
+                  name={"GPT"}
                 />
               );
             })}
@@ -237,7 +239,7 @@ export default function Home() {
                 <span>▲</span>
               )}
             </button>
-            {chat?.length > 3 && (
+            {chat?.length > 1 && (
               <button
                 className="w-12 h-12 text-2xl bg-transparent"
                 onClick={clearHistory}
@@ -248,19 +250,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <footer className="-bottom-7 absolute w-full z-0 flex items-center justify-center text-xs text-zinc-400">
-        <span className="mx-1 w-3 h-3 inline-block pt-2 bg-zinc-300 dark:bg-zinc-700 rounded-full"></span>
-        <span>Free Research Preview.</span>
-        <span className="mx-2 underline">
-          <a href="https://github.com/Lonor/gpt-next">Source Code</a>
-        </span>
-        <span className="underline">
-          <a href="https://lawrenceli.me/privacy">Privacy</a>
-        </span>
-        <span className="mx-2 underline">
-          <a href="https://status.lawrenceli.me">Status</a>
-        </span>
-      </footer>
+      <Footer />
     </div>
   );
 }

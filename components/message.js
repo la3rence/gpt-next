@@ -13,7 +13,7 @@ const md = new MarkdownIt({
   },
 });
 
-const Message = ({ role, content, serverUP }) => {
+const Message = ({ role, content, serverUP, name }) => {
   if (role === "user") {
     return (
       <>
@@ -39,7 +39,7 @@ const Message = ({ role, content, serverUP }) => {
         {serverUP && (
           <span className="rounded-full inline-block w-4 h-4 bg-blue-500 align-middle"></span>
         )}
-        <span className="pl-1 text-sm">GPT</span>
+        <span className="pl-1 text-sm">{name}</span>
       </div>
       <div
         className="mx-6 py-4"
