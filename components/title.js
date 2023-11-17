@@ -1,17 +1,9 @@
 import { TypeAnimation } from "react-type-animation";
-export default function Title() {
+export default function Title({ name }) {
   return (
     <div className="mx-6 mt-20 text-center">
       <TypeAnimation
-        sequence={[
-          "ChatGPT",
-          1000,
-          "●.lawrenceli.me",
-          2000,
-          "● ChatGPT",
-          2000,
-          "●",
-        ]}
+        sequence={[name, 1000, "●.lawrenceli.me", 2000, `● ${name}`, 2000, "●"]}
         wrapper="div"
         cursor={false}
         repeat={0}
