@@ -1,26 +1,24 @@
 "use client";
-
 import Footer from "@/components/footer";
 import { useChat } from "ai/react";
 import { Suspense, lazy } from "react";
+import "highlight.js/styles/github-dark.css";
 
 const Title = lazy(() => import("@/components/title"));
 const Message = lazy(() => import("@/components/message"));
 
 export default function Home() {
-  const { messages, input, handleInputChange, handleSubmit } = useChat({
-    api: process.env.NEXT_PUBLIC_LLAMA_API,
-    initialMessages: [
-      {
-        id: "system",
-        role: "system",
-        content: "你是一个 AI 助手，使用中文回复。",
-      },
-    ],
-    onResponse: (res) => {
-      console.debug(res);
-    },
-  });
+  const { messages, input, isLoading, handleInputChange, handleSubmit } =
+    useChat({
+      api: process.env.NEXT_PUBLIC_LLAMA_API,
+      initialMessages: [
+        // {
+        //   id: "system",
+        //   role: "system",
+        //   content: "你是一个 AI 助手，使用中文回复。",
+        // },
+      ],
+    });
 
   return (
     <div className="max-w-3xl mx-auto relative min-h-[90vh]">
@@ -53,6 +51,7 @@ export default function Home() {
                 onChange={handleInputChange}
                 value={input}
                 placeholder="send a prompt"
+                disabled={isLoading}
                 rows={1}
                 className="resize-none border-0 max-w-3xl w-full h-12 pl-4 p-3 bg-transparent
               outline-none max-h-24 overflow-y-hidden focus:ring-0 focus-visible:ring-0 "
