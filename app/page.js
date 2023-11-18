@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 import "highlight.js/styles/github-dark.css";
 import Footer from "@/components/footer";
+import Link from "next/link";
 
 const Message = lazy(() => import("@/components/message"));
 const Title = lazy(() => import("@/components/title"));
@@ -176,7 +177,13 @@ export default function Home() {
               We are facing some issues to fetch data from OpenAI server. We are
               actively investigating.
             </p>
-            <span>Status: https://status.lawrenceli.me</span>
+            <span>
+              Please try to use{" "}
+              <Link href="/llm" className="underline">
+                LLaMA
+              </Link>{" "}
+              at the moment.
+            </span>
           </div>
         )}
         <div className="mt-4">
