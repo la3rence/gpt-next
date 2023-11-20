@@ -1,13 +1,14 @@
 "use client";
 import Footer from "@/components/footer";
 import { useChat } from "ai/react";
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import "highlight.js/styles/github-dark.css";
 
 const Title = lazy(() => import("@/components/title"));
 const Message = lazy(() => import("@/components/message"));
 
 export default function Home() {
+  const [api, setApi] = useState(process.env.NEXT_PUBLIC_LLAMA_API);
   const {
     messages,
     input,
@@ -18,13 +19,22 @@ export default function Home() {
     handleSubmit,
     setMessages,
   } = useChat({
-    api: process.env.NEXT_PUBLIC_LLAMA_API,
+    api,
     initialMessages: [],
   });
 
   const clear = () => {
     setMessages([]);
   };
+
+  useEffect(() => {
+    const currentUrl = window.location.href;
+    const queryParams = new URLSearchParams(new URL(currentUrl).search);
+    const model = queryParams.get("model");
+    if (model) {
+      setApi(`${api}?model=${model}`);
+    }
+  }, []);
 
   return (
     <div className="max-w-3xl mx-auto relative min-h-[90vh]">
