@@ -21,6 +21,9 @@ export default function Home() {
   } = useChat({
     api,
     initialMessages: [],
+    onResponse: () => {
+      umami.track("LLM", { prompt: input });
+    },
   });
 
   const clear = () => {

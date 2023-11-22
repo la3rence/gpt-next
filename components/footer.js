@@ -4,7 +4,7 @@ export default function Footer() {
       <span className="mx-1 w-3 h-3 inline-block pt-2 bg-zinc-300 dark:bg-zinc-700 rounded-full"></span>
       <span>Free Research Preview.</span>
       <span className="mx-2 underline">
-        <a href="https://github.com/Lonor/gpt-next">Source Code</a>
+        <a href="https://github.com/Lonor/gpt-next">Source</a>
       </span>
       <span className="underline">
         <a href="https://lawrenceli.me/privacy">Privacy</a>
