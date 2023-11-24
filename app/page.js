@@ -25,7 +25,7 @@ export default function Home() {
     parentMessageId = localStorage.getItem("chat.parentMessageId") || null;
     const checkStatus = async () => {
       try {
-        const response = await fetch(process.env.NEXT_PUBLIC_GPT_STATUS, {
+        const response = await fetch("/chatgpt/backend-api/accounts/check", {
           headers: { authorization: "test" },
         });
         const data = await response.json();
@@ -78,7 +78,7 @@ export default function Home() {
     setChat([...chat]);
     let currentData = "";
     try {
-      await fetchEventSource(process.env.NEXT_PUBLIC_CHAT_API, {
+      await fetchEventSource("/chatgpt/backend-api/conversation", {
         method: "POST",
         mode: "cors",
         headers: {
