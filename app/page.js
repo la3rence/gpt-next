@@ -1,161 +1,43 @@
 "use client";
-import React, { useEffect, useRef, useState, lazy, Suspense } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { fetchEventSource } from "@microsoft/fetch-event-source";
-import "highlight.js/styles/github-dark.css";
 import Footer from "@/components/footer";
-import Link from "next/link";
+import { useChat } from "ai/react";
+import { Suspense, lazy, useEffect, useState } from "react";
+import "highlight.js/styles/github-dark.css";
 
-const Message = lazy(() => import("@/components/message"));
 const Title = lazy(() => import("@/components/title"));
-let parentMessageId = null;
-let conversationId = null;
+const Message = lazy(() => import("@/components/message"));
 
 export default function Home() {
-  const [chat, setChat] = useState([]);
-  const inputRef = useRef();
-  const bottomRef = useRef(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [serverUP, setServerUP] = useState(true);
-  const [inputText, setInputText] = useState("");
+  const [api, setApi] = useState(process.env.NEXT_PUBLIC_LLM_API);
+  const {
+    messages,
+    input,
+    isLoading,
+    reload,
+    stop,
+    handleInputChange,
+    handleSubmit,
+    setMessages,
+  } = useChat({
+    api,
+    initialMessages: [],
+    onResponse: () => {
+      umami.track("GPT", { prompt: input });
+    },
+  });
+
+  const clear = () => {
+    setMessages([]);
+  };
 
   useEffect(() => {
-    setChat(JSON.parse(localStorage.getItem("chat.history")) || []);
-    conversationId = localStorage.getItem("chat.conversationId") || null;
-    parentMessageId = localStorage.getItem("chat.parentMessageId") || null;
-    const checkStatus = async () => {
-      try {
-        const response = await fetch("/chatgpt/backend-api/accounts/check", {
-          headers: { authorization: "test" },
-        });
-        const data = await response.json();
-        if (response.status !== 200 || !data) {
-          setServerUP(false);
-        }
-      } catch (error) {
-        setServerUP(false);
-      }
-    };
-    checkStatus();
+    const currentUrl = window.location.href;
+    const queryParams = new URLSearchParams(new URL(currentUrl).search);
+    const model = queryParams.get("model");
+    if (model) {
+      setApi(`${api}?model=${model}`);
+    }
   }, []);
-
-  const send = async () => {
-    if (inputText === "" || !inputText) {
-      return;
-    }
-    chat.push({ role: "user", content: inputText });
-    setInputText("");
-    inputRef.current.value = "";
-    await answer(inputText);
-  };
-
-  const answer = async (question) => {
-    setIsLoading(true);
-    const body = {
-      messages: [
-        {
-          id: uuidv4(),
-          author: {
-            role: "user",
-          },
-          content: {
-            parts: [question],
-            content_type: "text",
-          },
-          create_time: (Date.now() / 1000).toFixed(7),
-        },
-      ],
-      parent_message_id: parentMessageId ? parentMessageId : uuidv4(),
-      model: "text-davinci-002-render-sha",
-      timezone_offset_min: -480,
-      arkose_token: null,
-      action: "next",
-    };
-    if (conversationId) {
-      body.conversation_id = conversationId;
-    }
-    chat.push({ role: "assistant", content: "●" });
-    setChat([...chat]);
-    let currentData = "";
-    try {
-      await fetchEventSource("/chatgpt/backend-api/conversation", {
-        method: "POST",
-        mode: "cors",
-        headers: {
-          "content-type": "text/event-stream",
-          authorization: "test",
-        },
-        body: JSON.stringify(body),
-        async onopen(res) {
-          setServerUP(true);
-          if (res.status != 200) {
-            setServerUP(false);
-            throw new Error(`Error code ${res.status} ${res.statusText}`);
-          }
-        },
-        onmessage(event) {
-          if (event.data === "[DONE]") {
-            return;
-          }
-          let data;
-          try {
-            data = JSON.parse(event.data);
-          } catch (error) {
-            return;
-          }
-          if (data.is_completion === true) {
-            return;
-          }
-          console.debug("sse onmessage", event.data);
-          currentData = data.message?.content?.parts?.[0];
-          conversationId = data.conversation_id;
-          parentMessageId = data.message?.id;
-          setAssistantChat(currentData + "●");
-          if (window.navigator.vibrate) {
-            window.navigator.vibrate(10);
-          }
-          bottomRef.current.scrollIntoView({ behavior: "smooth" });
-          localStorage.setItem("chat.conversationId", conversationId);
-          localStorage.setItem("chat.parentMessageId", parentMessageId);
-        },
-        onerror(error) {
-          throw error;
-        },
-        async onclose() {
-          console.debug("sse closed");
-          setAssistantChat(currentData);
-          setIsLoading(false);
-          localStorage.setItem("chat.history", JSON.stringify(chat));
-        },
-      });
-    } catch (error) {
-      setAssistantChat(error.message);
-      setIsLoading(false);
-      localStorage.setItem("chat.history", JSON.stringify(chat));
-      return;
-    }
-  };
-
-  const setAssistantChat = (content) => {
-    chat.pop();
-    chat.push({ role: "assistant", content });
-    setChat([...chat]);
-  };
-
-  const regenerate = async () => {
-    chat.pop();
-    await answer(chat.slice(-1)[0].content);
-  };
-  const clearHistory = () => {
-    if (window.confirm("确认清空当前记录?")) {
-      setChat([]);
-      localStorage.removeItem("chat.history");
-      localStorage.removeItem("chat.conversationId");
-      localStorage.removeItem("chat.parentMessageId");
-      parentMessageId = null;
-      conversationId = null;
-    }
-  };
 
   return (
     <div className="max-w-3xl mx-auto relative min-h-[90vh]">
@@ -167,95 +49,73 @@ export default function Home() {
         >
           <Title name="ChatGPT" />
         </Suspense>
-        {!serverUP && (
+        <form onSubmit={handleSubmit}>
+          {messages.map((message) => {
+            return (
+              <Message
+                key={message.id}
+                content={message.content}
+                role={message.role}
+                serverUP={true}
+                name="GPT"
+              />
+            );
+          })}
+          {messages?.length > 1 && !isLoading && (
+            <div className="flex">
+              <div className="flex-1"></div>
+              <div
+                className="p-1 h-6 w-6 mr-4 cursor-pointer text-lg"
+                onClick={reload}
+              >
+                ↺
+              </div>
+            </div>
+          )}
           <div
-            className="bg-orange-50 dark:bg-orange-950 border-l-4 border-orange-500 text-orange-700 p-4"
-            role="alert"
+            id="input"
+            className="fixed bottom-10 w-full max-w-3xl backdrop-blur caret-blue-500 z-10"
           >
-            <p className="font-bold">ChatGPT Status</p>
-            <p>
-              We are facing some issues to fetch data from OpenAI server. We are
-              actively investigating.
-            </p>
-            <span>
-              Please try to use{" "}
-              <Link href="/llm" className="underline">
-                LLaMA
-              </Link>{" "}
-              at the moment.
-            </span>
-          </div>
-        )}
-        <div className="mt-4">
-          <Suspense fallback={<div className="text-2xl text-center">●▲■</div>}>
-            {chat.map((messageObj, index) => {
-              return (
-                <Message
-                  key={index}
-                  content={messageObj.content}
-                  role={messageObj.role}
-                  serverUP={serverUP}
-                  name={"GPT"}
-                />
-              );
-            })}
-          </Suspense>
-        </div>
-        {chat.length > 1 && !isLoading && (
-          <div className="flex">
-            <div className="flex-1"></div>
-            <div
-              className="p-1 h-6 w-6 mr-4 cursor-pointer text-lg"
-              onClick={regenerate}
-            >
-              ↺
+            <div className="flex shadow-md border border-zinc-50 dark:border-zinc-800">
+              {isLoading && (
+                <button
+                  onClick={stop}
+                  className="text-2xl w-12 h-12 bg-transparent"
+                >
+                  ■
+                </button>
+              )}
+              <textarea
+                onChange={handleInputChange}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" && !event.nativeEvent.isComposing) {
+                    handleSubmit(event);
+                  }
+                }}
+                value={input}
+                placeholder="send a prompt"
+                disabled={isLoading}
+                rows={1}
+                className="resize-none border-0 max-w-3xl w-full h-12 pl-4 p-3 bg-transparent
+              outline-none max-h-24 overflow-y-hidden focus:ring-0 focus-visible:ring-0 "
+              />
+              <button
+                type="submit"
+                className="w-12 h-12 text-2xl bg-transparent"
+              >
+                <span>▲</span>
+              </button>
+              {messages?.length > 1 && (
+                <button
+                  className="w-12 h-12 text-2xl bg-transparent"
+                  onClick={clear}
+                >
+                  ○
+                </button>
+              )}
             </div>
           </div>
-        )}
-        <div ref={bottomRef} className="mb-36 text-center">
-          {isLoading && <span className="text-2xl">■</span>}
-        </div>
-        <div
-          id="input"
-          className="fixed bottom-10 w-full max-w-3xl backdrop-blur caret-blue-500 z-10"
-        >
-          <div className="flex shadow-md border border-zinc-50 dark:border-zinc-800">
-            <textarea
-              rows="1"
-              disabled={isLoading}
-              ref={inputRef}
-              placeholder="send a prompt"
-              onChange={(event) => {
-                setInputText(event.target.value);
-              }}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" && !event.nativeEvent.isComposing) {
-                  send();
-                }
-              }}
-              className="resize-none border-0 max-w-3xl w-full h-12 pl-4 p-3 bg-transparent
-              outline-none max-h-24 overflow-y-hidden focus:ring-0 focus-visible:ring-0 "
-            />
-            <button
-              className="w-12 h-12 text-2xl bg-transparent"
-              onClick={send}
-            >
-              {inputText === "" || !inputText ? (
-                <span className="text-zinc-500">▲</span>
-              ) : (
-                <span>▲</span>
-              )}
-            </button>
-            {chat?.length > 1 && (
-              <button
-                className="w-12 h-12 text-2xl bg-transparent"
-                onClick={clearHistory}
-              >
-                ○
-              </button>
-            )}
-          </div>
-        </div>
+        </form>
       </div>
       <Footer />
     </div>
