@@ -15,7 +15,7 @@
     "dotenv": "^16.2.0",
     "highlight.js": "^11.8.0",
     "markdown-it": "^13.0.1",
-    "next": "14.0.4-canary.13",
+    "next": "14.0.4-canary.32",
     "next-themes": "^0.2.1",
     "postcss": "8.4.31",
     "react": "18.2.0",
