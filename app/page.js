@@ -6,12 +6,16 @@ import "highlight.js/styles/github-dark.css";
 
 const Title = lazy(() => import("@/components/title"));
 const Message = lazy(() => import("@/components/message"));
+const MODELS = ["ChatGPT", "Mistral", "LLAMA 2 FP16", "LLAMA 2 INT8"];
 
 export default function Home() {
   const [api, setApi] = useState(process.env.NEXT_PUBLIC_LLM_API);
+  const [slash, setSlash] = useState(false);
+  const [modelIndex, setModelIndex] = useState(0);
   const {
     messages,
     input,
+    setInput,
     isLoading,
     reload,
     stop,
@@ -22,7 +26,7 @@ export default function Home() {
     api,
     initialMessages: [],
     onResponse: () => {
-      umami.track("GPT", { prompt: input });
+      umami.track(MODELS[modelIndex], { prompt: input });
     },
   });
 
@@ -31,23 +35,24 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const currentUrl = window.location.href;
-    const queryParams = new URLSearchParams(new URL(currentUrl).search);
-    const model = queryParams.get("model");
-    if (model) {
-      setApi(`${api}?model=${model}`);
+    if (0 <= modelIndex <= 3) {
+      setApi(`${process.env.NEXT_PUBLIC_LLM_API}?model=${modelIndex}`);
+      setSlash(false);
+      setInput("");
     }
-  }, []);
+  }, [modelIndex]);
 
   return (
     <div className="max-w-3xl mx-auto relative min-h-[90vh]">
       <div className="pb-8">
         <Suspense
           fallback={
-            <div className="mx-6 mt-20 text-3xl text-center">ChatGPT</div>
+            <div className="mx-6 mt-20 text-3xl text-center">
+              {MODELS[modelIndex]}
+            </div>
           }
         >
-          <Title name="ChatGPT" />
+          <Title name={MODELS[modelIndex]} />
         </Suspense>
         <form onSubmit={handleSubmit}>
           {messages.map((message) => {
@@ -57,7 +62,7 @@ export default function Home() {
                 content={message.content}
                 role={message.role}
                 serverUP={true}
-                name="GPT"
+                name={MODELS[modelIndex]}
               />
             );
           })}
@@ -76,6 +81,22 @@ export default function Home() {
             id="input"
             className="fixed bottom-10 w-full max-w-3xl backdrop-blur caret-blue-500 z-10"
           >
+            {slash && (
+              <div className="relative w-full font-mono mx-4 mb-2 text-center ">
+                <label htmlFor="modelIndex">Choose model: </label>
+                <select
+                  id="modelIndex"
+                  name="modelIndex"
+                  onChange={(e) => setModelIndex(e.target.value)}
+                >
+                  {MODELS.map((v, i) => (
+                    <option value={i} key={i}>
+                      {v}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div className="flex shadow-md border border-zinc-50 dark:border-zinc-800">
               {isLoading && (
                 <button
@@ -87,13 +108,18 @@ export default function Home() {
               )}
               <textarea
                 onChange={handleInputChange}
-                onKeyDown={(event) => {
+                onKeyUp={(event) => {
                   if (event.key === "Enter" && !event.nativeEvent.isComposing) {
                     handleSubmit(event);
                   }
+                  if (/^\/$/.test(input)) {
+                    setSlash(true);
+                  } else {
+                    setSlash(false);
+                  }
                 }}
                 value={input}
-                placeholder="send a prompt"
+                placeholder="send a prompt. hit `/` for other models."
                 disabled={isLoading}
                 rows={1}
                 className="resize-none border-0 max-w-3xl w-full h-12 pl-4 p-3 bg-transparent

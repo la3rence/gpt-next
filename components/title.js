@@ -11,8 +11,6 @@ export default function Title({ name }) {
           "● ▲ ■",
           1000,
           `● ${name}`,
-          2000,
-          "●",
         ]}
         wrapper="div"
         cursor={false}
