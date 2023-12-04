@@ -6,12 +6,15 @@ import "highlight.js/styles/github-dark.css";
 
 const Title = lazy(() => import("@/components/title"));
 const Message = lazy(() => import("@/components/message"));
-const MODELS = ["ChatGPT", "Mistral", "LLAMA 2 FP16", "LLAMA 2 INT8"];
 
 export default function Home() {
   const [api, setApi] = useState(process.env.NEXT_PUBLIC_LLM_API);
   const [slash, setSlash] = useState(false);
   const [modelIndex, setModelIndex] = useState(0);
+  const [MODELS, setMODELS] = useState([
+    "text-davinci-002-render-sha",
+    "@cf/meta/llama-2-7b-chat-int8",
+  ]);
   const {
     messages,
     input,
@@ -34,8 +37,18 @@ export default function Home() {
     setMessages([]);
   };
 
+  const fetchModels = async () => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_LLM_API}models`);
+    const models = await res.json();
+    setMODELS(models);
+  };
+
   useEffect(() => {
-    if (0 <= modelIndex <= 3) {
+    fetchModels();
+  }, []);
+
+  useEffect(() => {
+    if (0 <= modelIndex <= MODELS.length) {
       setApi(`${process.env.NEXT_PUBLIC_LLM_API}?model=${modelIndex}`);
       setSlash(false);
       setInput("");
@@ -83,7 +96,7 @@ export default function Home() {
           >
             {slash && (
               <div className="relative w-full mx-4 mb-2 text-center ">
-                <label htmlFor="modelIndex">Choose model: </label>
+                <label htmlFor="modelIndex"></label>
                 <select
                   id="modelIndex"
                   name="modelIndex"
@@ -120,7 +133,7 @@ export default function Home() {
                   }
                 }}
                 value={input}
-                placeholder="send a prompt. hit `/` for other models."
+                placeholder="hit `/` for more models"
                 disabled={isLoading}
                 rows={1}
                 className="resize-none border-0 max-w-3xl w-full h-12 pl-4 p-3 bg-transparent
