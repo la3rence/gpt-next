@@ -48,7 +48,7 @@ export default function Home() {
         <Suspense
           fallback={
             <div className="mx-6 mt-20 text-3xl text-center">
-              {MODELS[modelIndex]}
+              ● {MODELS[modelIndex]}
             </div>
           }
         >
@@ -82,12 +82,13 @@ export default function Home() {
             className="fixed bottom-10 w-full max-w-3xl backdrop-blur caret-blue-500 z-10"
           >
             {slash && (
-              <div className="relative w-full font-mono mx-4 mb-2 text-center ">
+              <div className="relative w-full mx-4 mb-2 text-center ">
                 <label htmlFor="modelIndex">Choose model: </label>
                 <select
                   id="modelIndex"
                   name="modelIndex"
-                  onChange={(e) => setModelIndex(e.target.value)}
+                  defaultValue={modelIndex}
+                  onChange={(e) => setModelIndex(Number(e.target.value))}
                 >
                   {MODELS.map((v, i) => (
                     <option value={i} key={i}>
