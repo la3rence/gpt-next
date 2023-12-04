@@ -95,8 +95,7 @@ export default function Home() {
             className="fixed bottom-10 w-full max-w-3xl backdrop-blur caret-blue-500 z-10"
           >
             {slash && (
-              <div className="relative w-full mx-4 mb-2 text-center ">
-                <label htmlFor="modelIndex"></label>
+              <div className="relative w-full mx-4 mb-2 text-center">
                 <select
                   id="modelIndex"
                   name="modelIndex"
