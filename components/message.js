@@ -13,7 +13,16 @@ const md = new MarkdownIt({
   },
 });
 
-const Message = ({ role, content, serverUP, name }) => {
+const Content = ({ content }) => (
+  <div
+    className="mx-6 py-4"
+    dangerouslySetInnerHTML={{
+      __html: md.render(`${content}`),
+    }}
+  ></div>
+);
+
+const Message = ({ role, content, name, isLoading }) => {
   if (role === "user") {
     return (
       <>
@@ -21,32 +30,18 @@ const Message = ({ role, content, serverUP, name }) => {
           <span className="rounded-full inline-block w-4 h-4 bg-zinc-600 align-middle"></span>
           <span className="pl-1 text-sm">YOU</span>
         </div>
-        <div
-          className="mx-6 py-4"
-          dangerouslySetInnerHTML={{
-            __html: md.render(`${content}`),
-          }}
-        ></div>
+        <Content content={content} />
       </>
     );
   }
   return (
     <>
       <div className="ml-6 flex items-center">
-        {!serverUP && (
-          <span className="rounded-full inline-block w-4 h-4 bg-red-500 align-middle"></span>
-        )}
-        {serverUP && (
-          <span className="rounded-full inline-block w-4 h-4 bg-blue-500 align-middle"></span>
-        )}
+        <span className="rounded-full inline-block w-4 h-4 bg-blue-500 align-middle"></span>
         <span className="pl-1 text-sm">{name}</span>
       </div>
-      <div
-        className="mx-6 py-4"
-        dangerouslySetInnerHTML={{
-          __html: md.render(`${content}`),
-        }}
-      ></div>
+      {isLoading && <Content content={content + "●"} />}
+      {!isLoading && <Content content={content} />}
     </>
   );
 };

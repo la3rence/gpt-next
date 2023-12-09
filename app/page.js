@@ -60,7 +60,7 @@ export default function Home() {
       <div className="pb-8">
         <Suspense
           fallback={
-            <div className="mx-6 mt-20 text-3xl text-center">
+            <div className="mx-6 mt-20 text-3xl text-center font-sans">
               ● {MODELS[modelIndex]}
             </div>
           }
@@ -68,13 +68,13 @@ export default function Home() {
           <Title name={MODELS[modelIndex]} />
         </Suspense>
         <form onSubmit={handleSubmit}>
-          {messages.map((message) => {
+          {messages.map((message, index) => {
             return (
               <Message
+                isLoading={isLoading && index === messages.length - 1}
                 key={message.id}
                 content={message.content}
                 role={message.role}
-                serverUP={true}
                 name={MODELS[modelIndex]}
               />
             );
@@ -83,7 +83,7 @@ export default function Home() {
             <div className="flex">
               <div className="flex-1"></div>
               <div
-                className="p-1 h-6 w-6 mr-4 cursor-pointer text-lg"
+                className="p-1 h-6 w-6 mr-4 cursor-pointer text-lg font-sans"
                 onClick={reload}
               >
                 ↺
@@ -95,7 +95,7 @@ export default function Home() {
             className="fixed bottom-10 w-full max-w-3xl backdrop-blur caret-blue-500 z-10"
           >
             {slash && (
-              <div className="relative w-full mx-4 mb-2 text-center">
+              <div className="relative w-full mb-2 text-center">
                 <select
                   id="modelIndex"
                   name="modelIndex"
@@ -114,7 +114,7 @@ export default function Home() {
               {isLoading && (
                 <button
                   onClick={stop}
-                  className="text-2xl w-12 h-12 bg-transparent"
+                  className="text-2xl w-12 h-12 bg-transparent font-sans"
                 >
                   ■
                 </button>
@@ -124,15 +124,16 @@ export default function Home() {
                 onKeyUp={(event) => {
                   if (event.key === "Enter" && !event.nativeEvent.isComposing) {
                     handleSubmit(event);
-                  }
-                  if (/^\/$/.test(input)) {
-                    setSlash(true);
                   } else {
-                    setSlash(false);
+                    if (input === "/") {
+                      setSlash(true);
+                    } else {
+                      setSlash(false);
+                    }
                   }
                 }}
                 value={input}
-                placeholder="hit `/` for more models"
+                placeholder=""
                 disabled={isLoading}
                 rows={1}
                 className="resize-none border-0 max-w-3xl w-full h-12 pl-4 p-3 bg-transparent
@@ -142,11 +143,12 @@ export default function Home() {
                 type="submit"
                 className="w-12 h-12 text-2xl bg-transparent"
               >
-                <span>▲</span>
+                {input && <span className="font-sans">▲</span>}
+                {!input && <span className="font-sans text-zinc-400">▲</span>}
               </button>
               {messages?.length > 1 && (
                 <button
-                  className="w-12 h-12 text-2xl bg-transparent"
+                  className="w-12 h-12 text-2xl bg-transparent font-sans"
                   onClick={clear}
                 >
                   ○
@@ -156,7 +158,7 @@ export default function Home() {
           </div>
         </form>
       </div>
-      <Footer />
+      <Footer text={MODELS[modelIndex]} />
     </div>
   );
 }

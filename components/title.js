@@ -1,7 +1,7 @@
 import { TypeAnimation } from "react-type-animation";
 export default function Title({ name }) {
   return (
-    <div className="mx-6 mt-20 text-center">
+    <div className="mx-6 mt-20 text-center text-zinc-600">
       <TypeAnimation
         sequence={[`● ${name}`, 1000, "●.lawrenceli.me", 1000, `●`]}
         wrapper="div"
