@@ -3,7 +3,7 @@ export default function Title({ name }) {
   return (
     <div className="mx-6 mt-20 text-center text-zinc-600">
       <TypeAnimation
-        sequence={[`● ${name}`, 1000, "●.lawrenceli.me", 1000, `●`]}
+        sequence={[`● ${name}`, 1000, "●", 500, "", 100]}
         wrapper="div"
         cursor={false}
         repeat={0}

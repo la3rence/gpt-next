@@ -22,13 +22,13 @@ const Content = ({ content }) => (
   ></div>
 );
 
-const Message = ({ role, content, name, isLoading }) => {
+const Message = ({ role, content, isLoading }) => {
   if (role === "user") {
     return (
       <>
         <div className="ml-6 flex items-center">
           <span className="rounded-full inline-block w-4 h-4 bg-zinc-600 align-middle"></span>
-          <span className="pl-1 text-sm">YOU</span>
+          <span className="pl-1 text-sm">{role.toUpperCase()}</span>
         </div>
         <Content content={content} />
       </>
@@ -38,7 +38,7 @@ const Message = ({ role, content, name, isLoading }) => {
     <>
       <div className="ml-6 flex items-center">
         <span className="rounded-full inline-block w-4 h-4 bg-blue-500 align-middle"></span>
-        <span className="pl-1 text-sm">{name}</span>
+        <span className="pl-1 text-sm">{role.toUpperCase()}</span>
       </div>
       {isLoading && <Content content={content + "●"} />}
       {!isLoading && <Content content={content} />}

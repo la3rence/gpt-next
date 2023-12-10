@@ -3,6 +3,7 @@ import Footer from "@/components/footer";
 import { useChat } from "ai/react";
 import { Suspense, lazy, useEffect, useState, useRef } from "react";
 import "highlight.js/styles/github-dark.css";
+import Edit from "react-contenteditable";
 
 const Title = lazy(() => import("@/components/title"));
 const Message = lazy(() => import("@/components/message"));
@@ -13,8 +14,15 @@ export default function Home() {
   const [modelIndex, setModelIndex] = useState(0);
   const [MODELS, setMODELS] = useState([
     "text-davinci-002-render-sha",
-    "@cf/meta/llama-2-7b-chat-int8",
+    "@hf/thebloke/zephyr-7b-beta-awq",
   ]);
+
+  const [prompt, setPrompt] = useState({
+    id: "1",
+    role: "system",
+    content: `你是一个精通一切领域的专家。`,
+  });
+
   const {
     messages,
     input,
@@ -27,7 +35,7 @@ export default function Home() {
     setMessages,
   } = useChat({
     api,
-    initialMessages: [],
+    initialMessages: [prompt],
     onResponse: () => {
       umami.track(MODELS[modelIndex], { prompt: input });
     },
@@ -35,7 +43,11 @@ export default function Home() {
   const bottomRef = useRef(null);
 
   const clear = () => {
-    setMessages([]);
+    if (messages[0]["role"] === "system") {
+      setMessages([messages[0]]);
+    } else {
+      setMessages([]);
+    }
   };
 
   const fetchModels = async () => {
@@ -62,6 +74,20 @@ export default function Home() {
     }
   }, [messages]);
 
+  const handlePromptChange = (e) => {
+    setMessages(
+      messages.map((message) => {
+        if (message.role === "system") {
+          message.content = e.target.value;
+          setPrompt({ id: "1", role: "system", content: e.target.value });
+          return message;
+        } else {
+          return message;
+        }
+      }),
+    );
+  };
+
   return (
     <div className="max-w-3xl mx-auto relative min-h-[90vh]">
       <div className="pb-8">
@@ -75,17 +101,31 @@ export default function Home() {
           <Title name={MODELS[modelIndex]} />
         </Suspense>
         <form onSubmit={handleSubmit}>
-          {messages.map((message, index) => {
-            return (
-              <Message
-                isLoading={isLoading && index === messages.length - 1}
-                key={message.id}
-                content={message.content}
-                role={message.role}
-                name={MODELS[modelIndex]}
-              />
-            );
-          })}
+          <>
+            <div className="ml-6 flex items-center">
+              <span className="inline-block w-4 h-4 bg-black dark:border rounded-sm align-middle"></span>
+              <span className="pl-1 text-sm">
+                PROMPT
+                <span className="text-zinc-400 mx-2 text-xs">editable</span>
+              </span>
+            </div>
+            <div className="mx-6 py-6 w-full">
+              <Edit html={prompt.content} onChange={handlePromptChange} />
+            </div>
+          </>
+          {messages
+            .filter((message) => message.role != "system")
+            .map((message, index) => {
+              return (
+                <Message
+                  isLoading={isLoading && index === messages.length - 1}
+                  key={message.id}
+                  content={message.content}
+                  role={message.role}
+                  // name={MODELS[modelIndex]}
+                />
+              );
+            })}
           <div className="flex mb-12" ref={bottomRef}>
             <div className="flex-1"></div>
             {messages?.length > 1 && !isLoading && (
@@ -155,10 +195,10 @@ export default function Home() {
               </button>
               {messages?.length > 1 && (
                 <button
-                  className="w-12 h-12 text-2xl bg-transparent font-sans  hover:text-3xl"
+                  className="w-12 h-12 text-zinc-400 text-3xl bg-transparent font-mono hover:text-4xl"
                   onClick={clear}
                 >
-                  ○
+                  ✕
                 </button>
               )}
             </div>
