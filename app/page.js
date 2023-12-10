@@ -1,7 +1,7 @@
 "use client";
 import Footer from "@/components/footer";
 import { useChat } from "ai/react";
-import { Suspense, lazy, useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState, useRef } from "react";
 import "highlight.js/styles/github-dark.css";
 
 const Title = lazy(() => import("@/components/title"));
@@ -32,6 +32,7 @@ export default function Home() {
       umami.track(MODELS[modelIndex], { prompt: input });
     },
   });
+  const bottomRef = useRef(null);
 
   const clear = () => {
     setMessages([]);
@@ -54,6 +55,12 @@ export default function Home() {
       setInput("");
     }
   }, [modelIndex]);
+
+  useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   return (
     <div className="max-w-3xl mx-auto relative min-h-[90vh]">
@@ -79,17 +86,17 @@ export default function Home() {
               />
             );
           })}
-          {messages?.length > 1 && !isLoading && (
-            <div className="flex">
-              <div className="flex-1"></div>
+          <div className="flex mb-12" ref={bottomRef}>
+            <div className="flex-1"></div>
+            {messages?.length > 1 && !isLoading && (
               <div
-                className="p-1 h-6 w-6 mr-4 cursor-pointer text-lg font-sans"
+                className="p-1 h-6 w-6 mr-4 cursor-pointer text-lg font-sans hover:text-xl transition"
                 onClick={reload}
               >
                 ↺
               </div>
-            </div>
-          )}
+            )}
+          </div>
           <div
             id="input"
             className="fixed bottom-10 w-full max-w-3xl backdrop-blur caret-blue-500 z-10"
@@ -114,7 +121,7 @@ export default function Home() {
               {isLoading && (
                 <button
                   onClick={stop}
-                  className="text-2xl w-12 h-12 bg-transparent font-sans"
+                  className="text-2xl w-12 h-12 bg-transparent font-sans  hover:text-3xl"
                 >
                   ■
                 </button>
@@ -137,18 +144,18 @@ export default function Home() {
                 disabled={isLoading}
                 rows={1}
                 className="resize-none border-0 max-w-3xl w-full h-12 pl-4 p-3 bg-transparent
-              outline-none max-h-24 overflow-y-hidden focus:ring-0 focus-visible:ring-0 "
+              outline-none max-h-24 overflow-y-hidden focus:ring-0 focus-visible:ring-0"
               />
               <button
                 type="submit"
-                className="w-12 h-12 text-2xl bg-transparent"
+                className="w-12 h-12 text-2xl bg-transparent "
               >
-                {input && <span className="font-sans">▲</span>}
-                {!input && <span className="font-sans text-zinc-400">▲</span>}
+                {input && <span className="font-sans hover:text-3xl">▲</span>}
+                {!input && <span className="font-sans text-zinc-400 ">▲</span>}
               </button>
               {messages?.length > 1 && (
                 <button
-                  className="w-12 h-12 text-2xl bg-transparent font-sans"
+                  className="w-12 h-12 text-2xl bg-transparent font-sans  hover:text-3xl"
                   onClick={clear}
                 >
                   ○
