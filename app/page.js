@@ -25,6 +25,7 @@ export default function Home() {
 
   const {
     messages,
+    setMessages,
     input,
     setInput,
     isLoading,
@@ -32,7 +33,6 @@ export default function Home() {
     stop,
     handleInputChange,
     handleSubmit,
-    setMessages,
   } = useChat({
     api,
     initialMessages: [prompt],
@@ -69,7 +69,7 @@ export default function Home() {
   }, [modelIndex]);
 
   useEffect(() => {
-    if (bottomRef.current) {
+    if (bottomRef.current && isLoading) {
       bottomRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
