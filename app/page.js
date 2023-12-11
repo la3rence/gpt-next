@@ -104,28 +104,11 @@ export default function Home() {
           <>
             <div className="mx-6 flex items-center">
               <span className="inline-block w-4 h-4 bg-black dark:border dark:border-zinc-700 rounded-sm align-middle"></span>
-              <span className="cursor-pointer">
-                <details>
-                  <summary className="list-none">
-                    <span className="px-1 text-sm">
-                      SYSTEM
-                      <span className="px-1 text-xs text-zinc-400">
-                        editable
-                      </span>
-                    </span>
-                  </summary>
-                  <span className="text-zinc-400 text-sm px-1">
-                    点击下方文本可编辑 Prompt. Prompt
-                    发挥着非常重要的作用，决定了模型文字的生成方向和质量.
-                    <a
-                      href="https://github.com/Lonor/GPTs"
-                      target="_blank"
-                      className="mx-1"
-                    >
-                      Examples
-                    </a>
-                  </span>
-                </details>
+              <span>
+                <span className="px-1 text-sm">
+                  SYSTEM
+                  <span className="px-1 text-xs text-zinc-400">editable</span>
+                </span>
               </span>
             </div>
             <div className="shadow-inner mt-2 max-w-3xl mb-4 dark:bg-zinc-800">
