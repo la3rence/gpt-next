@@ -20,7 +20,7 @@ export default function Home() {
   const [prompt, setPrompt] = useState({
     id: "1",
     role: "system",
-    content: `你是一个精通一切领域的专家。`,
+    content: `你是一个精通一切领域的专家；你会用精确、简短的语言回答我的提问；除非有特殊说明，否则一切回答都使用中文。`,
   });
 
   const {
@@ -128,9 +128,9 @@ export default function Home() {
                 </details>
               </span>
             </div>
-            <div className="mx-4 py-4 max-w-3xl mb-2">
+            <div className="shadow-inner mt-2 max-w-3xl mb-4 dark:bg-zinc-800">
               <Edit
-                className="p-2"
+                className="p-4"
                 html={prompt.content}
                 onChange={handlePromptChange}
               />
