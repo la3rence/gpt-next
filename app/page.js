@@ -102,15 +102,19 @@ export default function Home() {
         </Suspense>
         <form onSubmit={handleSubmit}>
           <>
-            <div className="ml-6 flex items-center">
-              <span className="inline-block w-4 h-4 bg-black dark:border rounded-sm align-middle"></span>
+            <div className="mx-6 flex items-center">
+              <span className="inline-block w-4 h-4 bg-black dark:border dark:border-zinc-700 rounded-sm align-middle"></span>
               <span className="pl-1 text-sm">
                 PROMPT
                 <span className="text-zinc-400 mx-2 text-xs">editable</span>
               </span>
             </div>
-            <div className="mx-6 py-6 w-full">
-              <Edit html={prompt.content} onChange={handlePromptChange} />
+            <div className="mx-6 py-6 max-w-3xl">
+              <Edit
+                className=""
+                html={prompt.content}
+                onChange={handlePromptChange}
+              />
             </div>
           </>
           {messages
@@ -118,7 +122,7 @@ export default function Home() {
             .map((message, index) => {
               return (
                 <Message
-                  isLoading={isLoading && index === messages.length - 1}
+                  isLoading={isLoading && index === messages.length - 2}
                   key={message.id}
                   content={message.content}
                   role={message.role}
@@ -139,7 +143,7 @@ export default function Home() {
           </div>
           <div
             id="input"
-            className="fixed bottom-10 w-full max-w-3xl backdrop-blur caret-blue-500 z-10"
+            className="fixed bottom-0 sm:bottom-10 w-full max-w-3xl backdrop-blur caret-blue-500 z-10"
           >
             {slash && (
               <div className="relative w-full mb-2 text-center">
@@ -161,7 +165,7 @@ export default function Home() {
               {isLoading && (
                 <button
                   onClick={stop}
-                  className="text-2xl w-12 h-12 bg-transparent font-sans  hover:text-3xl"
+                  className="text-2xl w-12 h-12 bg-transparent font-sans hover:text-3xl"
                 >
                   ■
                 </button>
@@ -190,12 +194,12 @@ export default function Home() {
                 type="submit"
                 className="w-12 h-12 text-2xl bg-transparent "
               >
-                {input && <span className="font-sans hover:text-3xl">▲</span>}
+                {input && <span className="font-sans">▲</span>}
                 {!input && <span className="font-sans text-zinc-400 ">▲</span>}
               </button>
               {messages?.length > 1 && (
                 <button
-                  className="w-12 h-12 text-zinc-400 text-3xl bg-transparent font-mono hover:text-4xl"
+                  className="w-12 h-12 text-zinc-500 text-2xl bg-transparent font-sans"
                   onClick={clear}
                 >
                   ✕
