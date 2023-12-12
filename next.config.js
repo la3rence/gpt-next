@@ -1,13 +1,3 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  async rewrites() {
-    return [
-      {
-        source: "/chatgpt/:path*",
-        destination: "/chatgpt",
-      },
-    ];
-  },
-};
-
+const nextConfig = {};
 module.exports = nextConfig;

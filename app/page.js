@@ -41,6 +41,7 @@ export default function Home() {
     },
   });
   const bottomRef = useRef(null);
+  const promptRef = useRef(null);
 
   const clear = () => {
     if (messages[0]["role"] === "system") {
@@ -57,6 +58,7 @@ export default function Home() {
   };
 
   useEffect(() => {
+    promptRef.current.focus();
     fetchModels();
   }, []);
 
@@ -111,9 +113,14 @@ export default function Home() {
                 </span>
               </span>
             </div>
-            <div className="shadow-inner mt-2 max-w-3xl mb-4 dark:bg-zinc-800">
+            <div
+              className="shadow-inner mt-2 max-w-3xl mb-4 dark:bg-zinc-800"
+              contentEditable="plaintext-only"
+            >
               <Edit
                 className="p-4"
+                innerRef={promptRef}
+                inputMode="text"
                 html={prompt.content}
                 onChange={handlePromptChange}
               />
