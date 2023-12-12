@@ -113,14 +113,16 @@ export default function Home() {
                 </span>
               </span>
             </div>
-            <div
-              className="shadow-inner mt-2 max-w-3xl mb-4 dark:bg-zinc-800"
-              contentEditable="plaintext-only"
-            >
+            <div className="shadow-inner mt-2 max-w-3xl mb-4 dark:bg-zinc-800">
               <Edit
                 className="p-4"
                 innerRef={promptRef}
                 inputMode="text"
+                onPaste={(e) => {
+                  e.preventDefault();
+                  const text = e.clipboardData.getData("text/plain");
+                  document.execCommand("insertText", false, text);
+                }}
                 html={prompt.content}
                 onChange={handlePromptChange}
               />
