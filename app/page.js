@@ -7,17 +7,18 @@ import Edit from "react-contenteditable";
 
 const Title = lazy(() => import("@/components/title"));
 const Message = lazy(() => import("@/components/message"));
+const DEFAULT_MODELS = [
+  "text-davinci-002-render-sha",
+  "gemini-pro",
+  "@hf/thebloke/zephyr-7b-beta-awq",
+];
+const SWITCHER = ["/", "@hf", "@cf", "你是谁", ...DEFAULT_MODELS];
 
 export default function Home() {
   const [api, setApi] = useState(process.env.NEXT_PUBLIC_LLM_API);
   const [slash, setSlash] = useState(false);
   const [modelIndex, setModelIndex] = useState(0);
-  const [MODELS, setMODELS] = useState([
-    "text-davinci-002-render-sha",
-    "gemini-pro",
-    "@hf/thebloke/zephyr-7b-beta-awq",
-  ]);
-
+  const [MODELS, setMODELS] = useState(DEFAULT_MODELS);
   const [prompt, setPrompt] = useState({
     id: "1",
     role: "system",
@@ -189,12 +190,15 @@ export default function Home() {
                 onChange={handleInputChange}
                 onKeyUp={(event) => {
                   if (event.key === "Enter" && !event.nativeEvent.isComposing) {
-                    if (input?.trim().length === 0) {
+                    if (
+                      input?.trim().length === 0 ||
+                      SWITCHER.includes(input)
+                    ) {
                       return;
                     }
                     handleSubmit(event);
                   } else {
-                    if (input === "/") {
+                    if (SWITCHER.includes(input)) {
                       setSlash(true);
                     } else {
                       setSlash(false);
