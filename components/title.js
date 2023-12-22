@@ -1,13 +1,13 @@
 import { TypeAnimation } from "react-type-animation";
 export default function Title({ name }) {
   return (
-    <div className="mx-6 mt-20 text-center text-zinc-600">
+    <div className="mx-6 mt-20 text-center dark:text-zinc-500">
       <TypeAnimation
-        sequence={[`● ${name}`, 1000, "●", 500, "", 100]}
+        sequence={[`● ${name}`, 300, "●", 500, "", 100]}
         wrapper="div"
         cursor={false}
         repeat={0}
-        deletionSpeed={60}
+        deletionSpeed={80}
         preRenderFirstString={true}
         style={{
           fontSize: "2em",

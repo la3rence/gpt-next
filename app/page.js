@@ -14,6 +14,7 @@ export default function Home() {
   const [modelIndex, setModelIndex] = useState(0);
   const [MODELS, setMODELS] = useState([
     "text-davinci-002-render-sha",
+    "gemini-pro",
     "@hf/thebloke/zephyr-7b-beta-awq",
   ]);
 
@@ -37,7 +38,9 @@ export default function Home() {
     api,
     initialMessages: [prompt],
     onResponse: () => {
-      umami.track(MODELS[modelIndex], { prompt: input });
+      umami.track(MODELS[modelIndex], {
+        prompt: `${new Date().toLocaleString()}: ${input}`,
+      });
     },
   });
   const bottomRef = useRef(null);
@@ -71,8 +74,8 @@ export default function Home() {
   }, [modelIndex]);
 
   useEffect(() => {
-    if (bottomRef.current && isLoading) {
-      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    if (isLoading) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
@@ -96,7 +99,8 @@ export default function Home() {
         <Suspense
           fallback={
             <div className="mx-6 mt-20 text-3xl text-center font-sans">
-              ● {MODELS[modelIndex]}
+              <span className="size-6 inline-block pt-2 dark:bg-zinc-500 rounded-full"></span>
+              {MODELS[modelIndex]}
             </div>
           }
         >
@@ -105,7 +109,7 @@ export default function Home() {
         <form onSubmit={handleSubmit}>
           <>
             <div className="mx-6 flex items-center">
-              <span className="inline-block w-4 h-4 bg-black dark:border dark:border-zinc-700 rounded-sm align-middle"></span>
+              <span className="inline-block size-4 bg-zinc-700 rounded-sm align-middle"></span>
               <span>
                 <span className="px-1 text-sm">
                   SYSTEM
@@ -145,7 +149,7 @@ export default function Home() {
             <div className="flex-1"></div>
             {messages?.length > 1 && !isLoading && (
               <div
-                className="p-1 h-6 w-6 mr-4 cursor-pointer text-lg font-sans hover:text-xl transition"
+                className="p-1 size-7 mr-4 cursor-pointer text-lg font-sans hover:text-xl transition text-zinc-600"
                 onClick={reload}
               >
                 ↺
@@ -176,7 +180,7 @@ export default function Home() {
               {isLoading && (
                 <button
                   onClick={stop}
-                  className="text-2xl w-12 h-12 bg-transparent font-sans hover:text-3xl"
+                  className="text-2xl size-12 bg-transparent font-sans hover:text-3xl"
                 >
                   ■
                 </button>
@@ -203,14 +207,14 @@ export default function Home() {
               />
               <button
                 type="submit"
-                className="w-12 h-12 text-2xl bg-transparent "
+                className="size-12 text-2xl bg-transparent"
               >
                 {input && <span className="font-sans">▲</span>}
                 {!input && <span className="font-sans text-zinc-400 ">▲</span>}
               </button>
               {messages?.length > 1 && (
                 <button
-                  className="w-12 h-12 text-zinc-500 text-2xl bg-transparent font-sans"
+                  className="size-12 text-zinc-500 text-2xl bg-transparent font-sans"
                   onClick={clear}
                 >
                   ✕
