@@ -189,6 +189,9 @@ export default function Home() {
                 onChange={handleInputChange}
                 onKeyUp={(event) => {
                   if (event.key === "Enter" && !event.nativeEvent.isComposing) {
+                    if (input?.trim().length === 0) {
+                      return;
+                    }
                     handleSubmit(event);
                   } else {
                     if (input === "/") {
@@ -205,10 +208,7 @@ export default function Home() {
                 className="resize-none border-0 max-w-3xl w-full h-12 pl-4 p-3 bg-transparent
               outline-none max-h-24 overflow-y-hidden focus:ring-0 focus-visible:ring-0"
               />
-              <button
-                type="submit"
-                className="size-12 text-2xl bg-transparent"
-              >
+              <button type="submit" className="size-12 text-2xl bg-transparent">
                 {input && <span className="font-sans">▲</span>}
                 {!input && <span className="font-sans text-zinc-400 ">▲</span>}
               </button>
