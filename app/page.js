@@ -15,7 +15,6 @@ const DEFAULT_MODELS = [
 const SWITCHER = ["/", "@hf", "@cf", "你是谁", ...DEFAULT_MODELS];
 
 export default function Home() {
-  const [api, setApi] = useState(process.env.NEXT_PUBLIC_LLM_API);
   const [slash, setSlash] = useState(false);
   const [modelIndex, setModelIndex] = useState(0);
   const [MODELS, setMODELS] = useState(DEFAULT_MODELS);
@@ -36,8 +35,9 @@ export default function Home() {
     handleInputChange,
     handleSubmit,
   } = useChat({
-    api,
+    api: process.env.NEXT_PUBLIC_LLM_API,
     initialMessages: [prompt],
+    body: { modelIndex },
     onResponse: () => {
       umami.track(MODELS[modelIndex], {
         prompt: `${new Date().toLocaleString()}: ${input}`,
@@ -68,7 +68,6 @@ export default function Home() {
 
   useEffect(() => {
     if (0 <= modelIndex <= MODELS.length) {
-      setApi(`${process.env.NEXT_PUBLIC_LLM_API}?model=${modelIndex}`);
       setSlash(false);
       setInput("");
     }
