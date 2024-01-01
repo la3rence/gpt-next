@@ -93,6 +93,19 @@ export default function Home() {
     );
   };
 
+  const handleTextAreaChange = (e) => {
+    const textarea = e.target;
+    textarea.style.height = "auto";
+    textarea.style.height = textarea.scrollHeight + "px";
+    return handleInputChange(e);
+  };
+
+  const handleSubmitChange = (e) => {
+    const textarea = e.target;
+    textarea.style.height = "auto";
+    return handleSubmit(e);
+  };
+
   return (
     <div className="max-w-3xl mx-auto relative min-h-[90vh]">
       <div className="pb-8">
@@ -106,7 +119,7 @@ export default function Home() {
         >
           <Title name={MODELS[modelIndex]} />
         </Suspense>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmitChange}>
           <>
             <div className="mx-6 flex items-center">
               <span className="inline-block size-4 bg-zinc-700 rounded-sm align-middle"></span>
@@ -186,7 +199,7 @@ export default function Home() {
                 </button>
               )}
               <textarea
-                onChange={handleInputChange}
+                onChange={handleTextAreaChange}
                 onKeyUp={(event) => {
                   if (event.key === "Enter" && !event.nativeEvent.isComposing) {
                     if (
@@ -195,7 +208,7 @@ export default function Home() {
                     ) {
                       return;
                     }
-                    handleSubmit(event);
+                    handleSubmitChange(event);
                   } else {
                     if (SWITCHER.includes(input)) {
                       setSlash(true);
@@ -209,7 +222,7 @@ export default function Home() {
                 disabled={isLoading}
                 rows={1}
                 className="resize-none border-0 max-w-3xl w-full h-12 pl-4 p-3 bg-transparent
-              outline-none max-h-24 overflow-y-hidden focus:ring-0 focus-visible:ring-0"
+              outline-none text-inherit overflow-y-hidden focus:ring-0 focus-visible:ring-0"
               />
               <button type="submit" className="size-12 text-2xl bg-transparent">
                 {input && <span className="font-sans">▲</span>}
