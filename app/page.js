@@ -218,7 +218,7 @@ export default function Home() {
                   }
                 }}
                 value={input}
-                placeholder=""
+                placeholder="输入 `/` 尝试切换模型"
                 disabled={isLoading}
                 rows={1}
                 className="resize-none border-0 max-w-3xl w-full h-12 pl-4 p-3 bg-transparent
