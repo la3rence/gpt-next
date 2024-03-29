@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   ai:
-    specifier: 3.0.15
-    version: 3.0.15(react@18.2.0)(solid-js@1.8.16)(svelte@4.2.12)(vue@3.4.21)(zod@3.22.4)
+    specifier: 3.0.16
+    version: 3.0.16(react@18.2.0)(solid-js@1.8.16)(svelte@4.2.12)(vue@3.4.21)(zod@3.22.4)
   autoprefixer:
     specifier: ^10.4.16
     version: 10.4.19(postcss@8.4.38)
@@ -498,8 +498,8 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-  /ai@3.0.15(react@18.2.0)(solid-js@1.8.16)(svelte@4.2.12)(vue@3.4.21)(zod@3.22.4):
-    resolution: {integrity: sha512-ZQOsVWvH8OOAz9nuOluOWUs/3U+c3w7m6iWEQPbaxsuRcG/8W6fjPD6gdtzwRA+wX5i2OxoA/01iX1VD2yVA1A==}
+  /ai@3.0.16(react@18.2.0)(solid-js@1.8.16)(svelte@4.2.12)(vue@3.4.21)(zod@3.22.4):
+    resolution: {integrity: sha512-P6GGUYbE8PDUVeGT9D7tT9nF7lufDjbieZ97YVIVL/eZkGcfXQMvJleO1VzJ1eutoI8f5Llazmhg4K66Gs5q3Q==}
     engines: {node: '>=14.6'}
     peerDependencies:
       react: ^18.2.0
