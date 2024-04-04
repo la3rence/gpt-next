@@ -10,7 +10,7 @@
     "fmt": "prettier --write ."
   },
   "dependencies": {
-    "ai": "3.0.16",
+    "ai": "3.0.18",
     "autoprefixer": "^10.4.16",
     "dotenv": "^16.2.0",
     "highlight.js": "^11.8.0",
