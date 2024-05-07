@@ -8,9 +8,9 @@ import Edit from "react-contenteditable";
 const Title = lazy(() => import("@/components/title"));
 const Message = lazy(() => import("@/components/message"));
 const DEFAULT_MODELS = [
-  "text-davinci-002-render-sha",
-  "gemini-pro",
-  "@hf/thebloke/zephyr-7b-beta-awq",
+  // "text-davinci-002-render-sha",
+  // "gemini-pro",
+  "@cf/meta/llama-3-8b-instruct",
 ];
 const SWITCHER = ["/", "@hf", "@cf", "你是谁", ...DEFAULT_MODELS];
 
@@ -21,7 +21,7 @@ export default function Home() {
   const [prompt, setPrompt] = useState({
     id: "1",
     role: "system",
-    content: `你是一个精通一切领域的专家；你会用精确、简短的语言回答我的提问；除非有特殊说明，否则一切回答都使用中文。`,
+    content: `你是一个精通一切领域的专家；除非有特殊说明，否则一切回答都使用中文。`,
   });
 
   const {
