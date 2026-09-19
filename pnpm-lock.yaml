@@ -12,8 +12,8 @@ dependencies:
     specifier: ^10.4.16
     version: 10.4.21(postcss@8.4.39)
   dotenv:
-    specifier: ^16.2.0
-    version: 16.5.0
+    specifier: ^18.0.0
+    version: 18.0.1
   highlight.js:
     specifier: ^11.8.0
     version: 11.11.1
@@ -1121,9 +1121,10 @@ packages:
       esutils: 2.0.3
     dev: true
 
-  /dotenv@16.5.0:
-    resolution: {integrity: sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==}
+  /dotenv@18.0.1:
+    resolution: {integrity: sha512-0eR4m4D/jH5eaI3evo2ZqqMii5mrTCR12v12VChdie6O1gPHs7XAjzTep0CWc1Bd+oNx3vVfbi734dK4zghigw==}
     engines: {node: '>=12'}
+    hasBin: true
     dev: false
 
   /eastasianwidth@0.2.0:
